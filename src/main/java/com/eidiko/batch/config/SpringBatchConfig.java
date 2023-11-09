@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 
 import com.eidiko.batch.entity.Customer;
 import com.eidiko.batch.repo.CustomerRepo;
@@ -82,6 +84,7 @@ public class SpringBatchConfig {
 				.<Customer,Customer>chunk(10)
 				.reader(reader())
 				.writer(writer())
+				.taskExecutor(taskExecutor())
 				.build();
 	}
 	
@@ -91,6 +94,13 @@ public class SpringBatchConfig {
 				.flow(step1())
 				.end()
 				.build();
+	}
+	
+	@Bean
+	public TaskExecutor  taskExecutor() {
+		SimpleAsyncTaskExecutor executor=new SimpleAsyncTaskExecutor();
+				executor.setConcurrencyLimit(10);
+				return executor;
 	}
 
 }
